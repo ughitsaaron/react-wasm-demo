@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>React + Rust Demo</title>
+  <style>
+    body {
+      background-color: #fefefe;
+      color: #101010;
+      font-family: "Garamond", Georgia, serif;
+      font-size: 21px;
+      margin: auto;
+      max-width: 500px;
+      padding-top: 20vh;
+      text-align: center;
+      width: 100%;
+    }
+
+    p {
+      margin: 1em 0;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #fafafa;
+      border-color: #1a1a1a;
+      box-shadow: 1px 1px 1px #3f3f3f;
+      color: #1a1a1a;
+      font-size: 16px;
+      margin-left: 18px;
+      max-width: 75%;
+      outline: none;
+      padding: 12px;
+    }
+
+    button:disabled {
+      background-color: #393939;
+      color: #fafafa;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p>This is a simple app demonstrating the use of WebAssembly (compiled from Rust) alongide TypeScript and React. This app was built using the <a href="https://github.com/browserify/rustify">rustify</a> plugin for Browserify.</p>
+  </header>
+  <main id="app"></main>
+  <footer>
+    <p>
+      demo by <a href="https://crimes.cool">aaron petcoff</a>. view the <a href="https://github.com/ughitsaaron/react-wasm-demo/">source on github</a>.
+    </p>
+  </footer>
+  <script src="dist/bundle.js"></script>
+</body>
+</html>
