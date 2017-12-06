@@ -18107,7 +18107,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var react_dom_1 = require("react-dom");
 var rust = 0;
-var wasm = new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,127,3,2,1,0,4,4,1,112,0,0,5,3,1,0,17,7,19,2,6,109,101,109,111,114,121,2,0,6,100,111,76,111,111,112,0,0,9,1,0,10,6,1,4,0,65,1,11,11,10,1,0,65,4,11,4,16,0,16,0]);
+var wasm = new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,127,3,2,1,0,4,4,1,112,0,0,5,3,1,0,17,7,20,2,6,109,101,109,111,114,121,2,0,7,100,111,95,108,111,111,112,0,0,9,1,0,10,10,1,8,0,65,128,148,235,220,3,11,11,10,1,0,65,4,11,4,16,0,16,0]);
 (function () {
     return __awaiter(this, void 0, void 0, function () {
         var doLoop, Application;
@@ -18121,10 +18121,20 @@ var wasm = new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,127,3,2,1,0,4,4,1,1
                         function Application(props) {
                             var _this = _super.call(this, props) || this;
                             _this.jsLoop = function (e, n) {
-                                _this.setState({ js: jsLoop() });
+                                var start = Date.now();
+                                var end;
+                                _this.setState({ js: !!jsLoop() }, function () {
+                                    end = Date.now();
+                                    this.setState({ jsms: end - start });
+                                }.bind(_this));
                             };
                             _this.rsLoop = function () {
-                                _this.setState({ wasm: doLoop() });
+                                var start = Date.now();
+                                var end;
+                                _this.setState({ wasm: !!doLoop() }, function () {
+                                    end = Date.now();
+                                    this.setState({ wasmms: end - start });
+                                }.bind(_this));
                             };
                             _this.reset = function () {
                                 _this.setState({ js: false, wasm: false });
@@ -18133,23 +18143,25 @@ var wasm = new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,127,3,2,1,0,4,4,1,1
                             _this.rsLoop = _this.rsLoop.bind(_this);
                             _this.state = {
                                 js: false,
-                                wasm: false
+                                jsms: 0,
+                                wasm: false,
+                                wasmms: 0
                             };
                             return _this;
                         }
                         Application.prototype.render = function () {
                             var _this = this;
-                            var _a = this.state, js = _a.js, wasm = _a.wasm;
+                            var _a = this.state, js = _a.js, wasm = _a.wasm, jsms = _a.jsms, wasmms = _a.wasmms;
                             return (React.createElement("div", null,
                                 React.createElement("button", { onClick: function (e) { return _this.jsLoop(e, js); }, disabled: js },
                                     "Count to 1 billion in JavaScript ",
-                                    js ? '(Finished)' : ''),
+                                    js ? "(Finished in " + jsms + "ms)" : ''),
                                 React.createElement("p", null,
                                     React.createElement("button", { onClick: function (_) { return _this.rsLoop(); }, disabled: wasm },
                                         "Count to 1 billion in WebAssembly ",
-                                        wasm ? '(Finished)' : '')),
+                                        wasm ? "(Finished in " + wasmms + "ms)" : '')),
                                 React.createElement("p", null,
-                                    React.createElement("button", { onClick: function (_) { return _this.reset(); } }, "Reset Demo"))));
+                                    React.createElement("button", { onClick: function (_) { return _this.reset(); } }, "Reset the Demo"))));
                         };
                         return Application;
                     }(React.PureComponent));
@@ -18164,12 +18176,14 @@ function jsLoop() {
     var i = 0;
     while (i < max) {
         i += 1;
+        if (i >= max) {
+            return i;
+        }
     }
-    return true;
 }
 function instantiateWasm() {
     return WebAssembly.instantiate(wasm, {})
-        .then(function (res) { return res.instance.exports.doLoop; })
+        .then(function (res) { return res.instance.exports.do_loop; })
         .catch(function (e) { return console.error('WASM failed', e); });
 }
 

@@ -5,3 +5,5 @@ npm-debug.log
 *.js.map
 !dist/bundle.js
 .DS_Store
+/target/
+**/*.rs.bk

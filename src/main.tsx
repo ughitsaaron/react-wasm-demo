@@ -4,11 +4,13 @@ import { render } from 'react-dom';
 declare const WebAssembly: any;
 
 const rust = require('rustify');
-const wasm = rust('./main.rs');
+const wasm = rust('./do_loop.rs');
 
 interface IApplicationState {
   js: boolean;
   wasm: boolean;
+  jsms: number;
+  wasmms: number;
 }
 
 (async function () {
@@ -22,15 +24,36 @@ interface IApplicationState {
       this.jsLoop = this.jsLoop.bind(this);
       this.rsLoop = this.rsLoop.bind(this);
 
-      this.state = { js: false, wasm: false };
+      this.state = {
+        js: false,
+        jsms: 0,
+        wasm: false,
+        wasmms: 0
+      };
     }
 
     jsLoop = (e: React.MouseEvent<HTMLButtonElement>, n: boolean): void => {
-      this.setState({ js: jsLoop() });
+      const start = Date.now();
+
+      var end: number;
+
+      this.setState({ js: !!jsLoop() }, function () {
+        end = Date.now();
+
+        this.setState({ jsms: end - start });
+      }.bind(this));
     }
 
     rsLoop = (): void => {
-      this.setState({ wasm: doLoop() });
+      const start = Date.now();
+
+      var end: number;
+
+      this.setState({ wasm: !!doLoop() }, function () {
+        end = Date.now();
+
+        this.setState({ wasmms: end - start });
+      }.bind(this));
     }
 
     reset = (): void => {
@@ -38,12 +61,12 @@ interface IApplicationState {
     }
 
     render() {
-      const { js, wasm } = this.state;
+      const { js, wasm, jsms, wasmms } = this.state;
 
       return (<div>
-        <button onClick={e => this.jsLoop(e, js)} disabled={js}>Count to 1 billion in JavaScript {js ? '(Finished)' : ''}</button>
+        <button onClick={e => this.jsLoop(e, js)} disabled={js}>Count to 1 billion in JavaScript {js ? `(Finished in ${jsms}ms)` : ''}</button>
         <p>
-        <button onClick={_ => this.rsLoop()} disabled={wasm}>Count to 1 billion in WebAssembly {wasm ? '(Finished)' : ''}</button>
+        <button onClick={_ => this.rsLoop()} disabled={wasm}>Count to 1 billion in WebAssembly {wasm ? `(Finished in ${wasmms}ms)` : ''}</button>
         </p>
         <p>
           <button onClick={_ => this.reset()}>Reset the Demo</button>
@@ -62,13 +85,15 @@ function jsLoop() {
 
   while (i < max) {
     i += 1;
-  }
 
-  return true;
+    if (i >= max) {
+      return i;
+    }
+  }
 }
 
 function instantiateWasm() {
   return WebAssembly.instantiate(wasm, {})
-    .then(res => res.instance.exports.doLoop)
+    .then(res => res.instance.exports.do_loop)
     .catch(e => console.error('WASM failed', e));
 }
